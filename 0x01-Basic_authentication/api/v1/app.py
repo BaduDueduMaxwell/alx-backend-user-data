@@ -14,6 +14,26 @@ app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 
+auth = None
+auth_type = os.getenv("AUTH_TYPE")
+if auth_type == "auth":
+    from api.v1.auth.auth import Auth
+    auth = Auth()
+
+
+@app.before_request
+def before_request():
+    """Handler for filtering requests"""
+    excluded_paths = ['/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
+    
+    # Do nothing if auth is None or if the path is excluded
+    if auth and auth.require_auth(request.path, excluded_paths):
+        if auth.authorization_header(request) is None:
+            abort(401, description="Unauthorized")
+        if auth.current_user(request) is None:
+            abort(403, description="Forbidden")
+
+
 @app.errorhandler(404)
 def not_found(error) -> str:
     """ Not found handler
@@ -25,14 +45,14 @@ def not_found(error) -> str:
 def request_unauthorized(error) -> str:
     """ Not unauthorized handler
     """
-    return jsonifyy({"error": "Unauthorizeed"}), 401
+    return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def request_forbidden(error) -> str:
     """ Forbidden handler
     """
-    return jsonifyy({"error": "Forbidden"}), 403
+    return jsonify({"error": "Forbidden"}), 403
 
 
 if __name__ == "__main__":
