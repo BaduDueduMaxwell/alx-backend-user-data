@@ -20,16 +20,13 @@ class Auth:
         for excluded_path in excluded_paths:
             # Remove the trailing slash and check for wildcard (*) at the end
             normalized_excluded_path = excluded_path.rstrip('/')
-            
             # If excluded_path ends with '*', match the prefix
             if normalized_excluded_path.endswith('*'):
                 if normalized_path.startswith(normalized_excluded_path[:-1]):
                     return False
             elif normalized_path == normalized_excluded_path:
                 return False
-
         return True
-
 
     def authorization_header(self, request=None) -> str:
         """Returns the authorization header from the request"""
