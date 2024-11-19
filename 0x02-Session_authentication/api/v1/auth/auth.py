@@ -45,5 +45,5 @@ class Auth:
             return None
         # Get the cookie name from the environment variable SESSION_NAME
         session_name = os.getenv('SESSION_NAME', '_my_session_id')
-        # Get the cookie value from the request's cookies using .get() 
+        # Get the cookie value from the request's cookies using .get()
         return request.cookies.get(session_name)
