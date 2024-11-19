@@ -4,6 +4,7 @@ Route module for the API
 """
 from typing import List, TypeVar
 from flask import request
+import os
 
 
 class Auth:
@@ -37,3 +38,12 @@ class Auth:
     def current_user(self, request=None) -> TypeVar('User'):
         """Returns the current user based on the request"""
         return None  # Placeholder for now
+
+    def session_cookie(self, request=None):
+        """Return cookie value from a request"""
+        if request is None:
+            return None
+        # Get the cookie name from the environment variable SESSION_NAME
+        session_name = os.getenv('SESSION_NAME', '_my_session_id')
+        # Get the cookie value from the request's cookies using .get() 
+        return request.cookies.get(session_name)
