@@ -49,18 +49,11 @@ class DB:
 
     def find_user_by(self, **kwargs) -> User:
         """Find a user based on arbitrary keyword arguments"""
-        if not kwargs:
-            raise InvalidRequestError("No query parameters provided.")
-
-        column_names = User.__table__.columns.keys()
-        for key in kwargs.keys():
-            if key not in column_names:
-                raise InvalidRequestError(f"Invalid query argument: {key}")
-
-        user = self._session.query(User).filter_by(**kwargs).first()
-
-        if user is None:
+        try:
+            user = self._session.query(User).filter_by(**kwargs).one()
+            return user
+        except NoResultFound:
             raise NoResultFound(
                 "No user found matching the provided criteria.")
-
-        return user
+        except InvalidRequestError:
+            raise InvalidRequestError("Invalid query arguments.")
